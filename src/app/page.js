@@ -648,7 +648,7 @@ function ProfileOrb() {
         overflow: "hidden", animation: "float 7s ease-in-out infinite",
       }}>
         <img
-          src="/hero.png"
+          src="/hero.PNG"
           alt="Himanshu Chavan"
           style={{ width: "100%", height: "100%", objectFit: "cover", borderRadius: "50%" }}
           onError={(e) => {
