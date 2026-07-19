@@ -1,6 +1,25 @@
 export default function ProfileOrb() {
   return (
-    <div style={{ position: "relative", width: 360, height: 360, flexShrink: 0 }}>
+    <div className="profile-orb" style={{ position: "relative", flexShrink: 0 }}>
+      <style>{`
+        .profile-orb {
+          width: 360px;
+          height: 360px;
+        }
+        @media (max-width: 900px) {
+          .profile-orb { width: 300px; height: 300px; }
+        }
+        @media (max-width: 480px) {
+          .profile-orb { width: 220px; height: 220px; }
+        }
+        .profile-orb .orb-chip {
+          display: block;
+        }
+        @media (max-width: 480px) {
+          .profile-orb .orb-chip { display: none; }
+        }
+      `}</style>
+
       <div style={{
         position: "absolute", inset: -16,
         borderRadius: "50%", border: "1px dashed rgba(59,130,246,.3)",
@@ -45,7 +64,7 @@ export default function ProfileOrb() {
         { label: "Docker",    top: 10,   right: -54, c: "#06B6D4",  dur: 4.4 },
         { label: "Langchain", bottom: 20, right: -60, c: "#fb5223", dur: 5.8 },
       ].map((ch) => (
-        <div key={ch.label} style={{
+        <div key={ch.label} className="orb-chip" style={{
           position: "absolute",
           top: ch.top, bottom: ch.bottom, left: ch.left, right: ch.right,
           background: "rgba(8,11,18,.9)", border: `1px solid ${ch.c}44`,

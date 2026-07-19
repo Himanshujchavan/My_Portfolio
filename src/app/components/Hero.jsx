@@ -1,15 +1,62 @@
 "use client";
+import { useRef, useEffect } from "react";
 import Typewriter from "./Typewriter";
 import ProfileOrb from "./ProfileOrb";
 
 export default function Hero() {
+  const sectionRef = useRef(null);
+  const colsRef = useRef(null);
+
   const scrollTo = (id) => {
     document.getElementById(id)?.scrollIntoView({ behavior: "smooth", block: "start" });
   };
 
+  useEffect(() => {
+    let ctx;
+
+    (async () => {
+      const gsapModule = await import("gsap");
+      const stModule = await import("gsap/ScrollTrigger");
+      const gsap = gsapModule.gsap || gsapModule.default;
+      const ScrollTrigger = stModule.ScrollTrigger || stModule.default;
+      gsap.registerPlugin(ScrollTrigger);
+
+      ctx = gsap.context(() => {
+        const mm = gsap.matchMedia();
+
+        // Only run the scroll-linked "sink" transform on desktop/tablet.
+        // On mobile, address-bar-driven viewport height changes make
+        // scrub animations unreliable and can leave content faded on load.
+        mm.add("(min-width: 769px)", () => {
+          gsap.to(colsRef.current, {
+            yPercent: -12,
+            scale: 0.94,
+            opacity: 0.15,
+            filter: "blur(6px)",
+            ease: "none",
+            scrollTrigger: {
+              trigger: sectionRef.current,
+              start: "top top",
+              end: "bottom top",
+              scrub: 0.6,
+            },
+          });
+        });
+
+        // Mobile: simple guaranteed-visible fade-in, no scroll-linked transforms.
+        mm.add("(max-width: 768px)", () => {
+          gsap.set(colsRef.current, { clearProps: "all" });
+        });
+      }, sectionRef);
+    })();
+
+    return () => ctx && ctx.revert();
+  }, []);
+
   return (
     <section
       id="hero"
+      ref={sectionRef}
       style={{
         minHeight: "100vh", display: "flex", alignItems: "center",
         padding: "calc(var(--nav) + 60px) 5% 80px",
@@ -26,10 +73,12 @@ export default function Hero() {
       <div style={{ position:"absolute", width:350, height:350, borderRadius:"50%", background:"rgba(16,185,129,.07)", filter:"blur(80px)", bottom:0, left:"8%", pointerEvents:"none" }} />
 
       <div
+        ref={colsRef}
         className="hero-cols"
         style={{
           position: "relative", display: "flex", alignItems: "center",
           justifyContent: "space-between", gap: 64, width: "100%", maxWidth: 1100,
+          willChange: "transform, opacity, filter",
         }}
       >
         <div style={{ flex: 1, minWidth: 0 }}>
@@ -45,7 +94,7 @@ export default function Hero() {
           </div>
 
           <h1 style={{
-            fontFamily: "var(--display)", fontSize: "clamp(42px,6.5vw,74px)",
+            fontFamily: "var(--display)", fontSize: "clamp(38px,6.5vw,74px)",
             fontWeight: 800, lineHeight: 1.05, letterSpacing: "-2px", marginBottom: 18,
             animation: "fadeUp .7s ease .22s both",
           }}>
@@ -89,7 +138,7 @@ export default function Hero() {
           </div>
 
           <div style={{
-            display: "flex", gap: 36, flexWrap: "wrap",
+            display: "flex", gap: 28, flexWrap: "wrap",
             paddingTop: 28, borderTop: "1px solid var(--bdr)",
             animation: "fadeUp .7s ease .7s both",
           }}>
@@ -101,20 +150,20 @@ export default function Hero() {
               { n: "300+", l: "LinkedIn" },
             ].map((s) => (
               <div key={s.l}>
-                <div style={{ fontFamily:"var(--display)", fontSize:28, fontWeight:700, lineHeight:1 }}>{s.n}</div>
+                <div style={{ fontFamily:"var(--display)", fontSize:"clamp(22px,4vw,28px)", fontWeight:700, lineHeight:1 }}>{s.n}</div>
                 <div style={{ fontSize:12, color:"var(--text-s)", marginTop:5, fontFamily:"var(--mono)" }}>{s.l}</div>
               </div>
             ))}
             <a href="/certificates" style={{ textDecoration: "none", color: "inherit" }}>
               <div style={{ cursor: "pointer" }}>
-                <div style={{ fontFamily:"var(--display)", fontSize:28, fontWeight:700, lineHeight:1, color:"var(--blue)" }}>20+</div>
+                <div style={{ fontFamily:"var(--display)", fontSize:"clamp(22px,4vw,28px)", fontWeight:700, lineHeight:1, color:"var(--blue)" }}>20+</div>
                 <div style={{ fontSize:12, color:"var(--text-s)", marginTop:5, fontFamily:"var(--mono)" }}>Certs ↗</div>
               </div>
             </a>
           </div>
         </div>
 
-        <div style={{ animation: "fadeUp .9s ease .3s both" }}>
+        <div style={{ animation: "fadeUp .9s ease .3s both", maxWidth: "100%" }}>
           <ProfileOrb />
         </div>
       </div>
