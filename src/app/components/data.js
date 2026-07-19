@@ -163,6 +163,7 @@ export const PROJECTS = [
     name: "Distributed Event-Driven Ticketing Engine",
     desc: "High-performance flash-sale pipeline with strict consistency — decouples inventory reservation from async payment settlement using Kafka, Redis, and the Transactional Outbox Pattern.",
     stack: ["Java", "Spring Boot", "PostgreSQL", "Redis", "Apache Kafka", "Debezium", "Docker", "Prometheus", "Grafana"],
+    featured: true,
     details: {
       type: "Individual", status: "Complete",
       github: null,
@@ -197,6 +198,7 @@ export const PROJECTS = [
     name: "AI Multi-Agent Healthcare Platform",
     desc: "Multi-agent LangChain system assisting clinicians in diabetes risk assessment — orchestrating specialist agents for report analysis, risk prediction, and emergency alerting.",
     stack: ["LangChain", "FastAPI", "PostgreSQL", "MongoDB", "Python"],
+    featured: true,
     details: {
       type: "Team", status: "Complete",
       github: null,
@@ -231,6 +233,7 @@ export const PROJECTS = [
     name: "VA-2 Genomic Data Analysis Platform",
     desc: "AI + blockchain platform combining Evo 2 genomic foundation model fine-tuning with BNB Smart Chain provenance for secure, ownership-tracked genomic research.",
     stack: ["FastAPI", "PostgreSQL", "Evo 2", "Python", "BNB Smart Chain"],
+    featured: true,
     details: {
       type: "Team", status: "Complete",
       github: null,
@@ -265,6 +268,7 @@ export const PROJECTS = [
     name: "Groundwater Resource Evaluation System",
     desc: "SIH mobile app enabling government agencies to monitor groundwater via DWLR station data — featuring GIS maps, real-time analytics, and alert interfaces for Android and iOS.",
     stack: ["React Native", "Expo", "TypeScript", "Expo Router"],
+    featured: true,
     details: {
       type: "Team", status: "Complete",
       github: null,
