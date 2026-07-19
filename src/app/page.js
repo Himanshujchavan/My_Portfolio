@@ -90,14 +90,86 @@ const GLOBAL_CSS = `
   }
   .btn-resume:hover { border-color:var(--emerald); background:rgba(16,185,129,.1); transform:translateY(-2px); box-shadow:0 6px 20px rgba(16,185,129,.2); }
 
-  /* ─ Cards ───────────────────────── */
+  /* ─ Project Cards ────────────────── */
   .project-card {
-    background:var(--card); border:1px solid var(--bdr);
-    border-radius:14px; padding:28px;
-    display:flex; flex-direction:column;
-    transition:border-color .25s, transform .25s, box-shadow .25s;
+    background: var(--card);
+    border: 1px solid var(--bdr);
+    border-radius: 16px;
+    padding: 26px;
+    display: flex;
+    flex-direction: column;
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: border-color .3s cubic-bezier(.2,.8,.2,1),
+                transform .3s cubic-bezier(.2,.8,.2,1),
+                box-shadow .3s cubic-bezier(.2,.8,.2,1);
   }
-  .project-card:hover { border-color:var(--blue); transform:translateY(-4px); box-shadow:0 16px 40px rgba(59,130,246,.12); }
+  .project-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,.025) 0%, transparent 60%);
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity .3s;
+  }
+  .project-card:hover::before { opacity: 1; }
+  .project-card .pc-expand {
+    opacity: 0;
+    transform: translateY(4px);
+    transition: opacity .25s, transform .25s;
+  }
+  .project-card:hover .pc-expand {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ─ Project Modal ────────────────── */
+  @keyframes backdropIn  { from{opacity:0} to{opacity:1} }
+  @keyframes modalSlideIn { from{opacity:0;transform:scale(.94) translateY(18px)} to{opacity:1;transform:scale(1) translateY(0)} }
+  @keyframes shimmerSlide {
+    0%   { background-position: -200% 0; }
+    100% { background-position: 200% 0; }
+  }
+  .modal-backdrop {
+    position: fixed; inset: 0; z-index: 900;
+    background: rgba(6,8,15,.78);
+    backdrop-filter: blur(14px);
+    display: flex; align-items: center; justify-content: center;
+    padding: 24px;
+    animation: backdropIn .25s ease;
+  }
+  .modal-panel {
+    position: relative;
+    background: linear-gradient(145deg, #111827, #0d1525);
+    border-radius: 20px;
+    width: 100%; max-width: 920px;
+    max-height: 90vh;
+    overflow-y: auto;
+    animation: modalSlideIn .3s cubic-bezier(.2,.8,.2,1);
+    scrollbar-width: thin;
+  }
+  .modal-panel::-webkit-scrollbar { width: 4px; }
+  .modal-panel::-webkit-scrollbar-track { background: transparent; }
+  .modal-panel::-webkit-scrollbar-thumb { background: var(--bdr2); border-radius: 4px; }
+  .modal-close {
+    position: absolute; top: 20px; right: 20px; z-index: 10;
+    width: 36px; height: 36px;
+    background: rgba(255,255,255,.06); border: 1px solid var(--bdr2);
+    border-radius: 50%; cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; color: var(--text-s);
+    transition: background .2s, color .2s, transform .2s;
+  }
+  .modal-close:hover { background: rgba(255,255,255,.12); color: var(--text); transform: scale(1.1) rotate(90deg); }
+  .metric-chip {
+    background: rgba(255,255,255,.04);
+    border: 1px solid var(--bdr);
+    border-radius: 10px;
+    padding: 14px 16px;
+    transition: border-color .2s, transform .2s;
+  }
+  .metric-chip:hover { transform: translateY(-2px); }
 
   /* ─ Skills ──────────────────────── */
   .skill-pill {
@@ -365,79 +437,245 @@ const SKILLS = [
 
 const PROJECTS = [
   {
-    emoji: "🛡️",
+    emoji: "🚆",
     bg: "rgba(59,130,246,0.12)",
     accent: "#3B82F6",
-    badge: "ML · FinTech",
-    name: "Real-Time Fraud Detection",
-    desc: "Real-time transaction monitoring platform using behavioral analytics, device fingerprinting and geolocation. XGBoost + Random Forest risk-scoring engine deployed via Dockerized microservices with REST APIs.",
-    stack: ["FastAPI", "XGBoost", "Random Forest", "Docker", "PostgreSQL", "Python"],
+    badge: "Java · Full Stack",
+    name: "RailConnect – Smart Railway Reservation",
+    desc: "Full-stack railway reservation platform automating the complete ticket booking lifecycle with an intelligent seat allocation engine, concurrent booking safety, and unique PNR generation.",
+    stack: ["Java", "Spring Boot", "Spring Security", "JWT", "PostgreSQL", "React.js", "Tailwind CSS", "Swagger"],
     featured: true,
+    details: {
+      type: "Individual", status: "Complete",
+      github: null,
+      problem: "Traditional railway booking systems suffer from seat conflicts under concurrent load, manual coach management, and insecure authentication — making them fragile at enterprise scale.",
+      contributions: [
+        "Designed an intelligent seat allocation engine that auto-generates coaches and prevents race-condition double-bookings",
+        "Implemented PNR generation system with unique, collision-free ticket identifiers",
+        "Built role-based access control (RBAC) using Spring Security + JWT for admin and passenger portals",
+        "Developed full booking lifecycle: search → reserve → cancel → refund with atomic DB transactions",
+        "Exposed RESTful APIs documented via Swagger UI for admin and client consumers",
+      ],
+      metrics: [
+        { label: "Booking Lifecycle", value: "Fully Automated" },
+        { label: "Auth", value: "JWT + Spring Security" },
+        { label: "Concurrency", value: "Race-condition safe" },
+        { label: "Project Type", value: "Individual" },
+      ],
+      stackDetails: [
+        "Java 21 + Spring Boot 3 for core backend services",
+        "Spring Security with stateless JWT authentication",
+        "PostgreSQL with optimistic locking for seat reservation",
+        "React.js + Tailwind CSS + ShadCN/UI frontend",
+        "Swagger / OpenAPI 3 documentation",
+      ],
+    },
+  },
+  {
+    emoji: "💳",
+    bg: "rgba(244,63,94,0.12)",
+    accent: "#F43F5E",
+    badge: "AI/ML · FinTech",
+    name: "Real-Time Fraud Detection System",
+    desc: "AI-powered platform detecting fraudulent transactions via dynamic risk scoring — analyzing behavior, device fingerprints, and geolocation with XGBoost + Random Forest inference.",
+    stack: ["Python", "FastAPI", "Docker", "PostgreSQL", "XGBoost", "Random Forest", "Redis", "Kafka"],
+    featured: true,
+    details: {
+      type: "Individual", status: "Complete",
+      github: null,
+      problem: "Rule-based fraud detectors miss novel attack patterns and flag too many false positives, causing genuine customers to be blocked while sophisticated fraud slips through.",
+      contributions: [
+        "Built dynamic risk scoring engine combining XGBoost + Random Forest ensemble models",
+        "Engineered behavioral analytics features: transaction velocity, geo-deviation, device fingerprinting",
+        "Developed low-latency FastAPI inference layer with sub-50ms response times",
+        "Containerized full stack with Docker Compose for reproducible deployment",
+        "Designed roadmap integrating Redis for feature caching and Kafka for real-time event streaming",
+      ],
+      metrics: [
+        { label: "Inference Latency", value: "< 50ms" },
+        { label: "Model", value: "XGBoost + RF Ensemble" },
+        { label: "Signals", value: "Behavior + Geo + Device" },
+        { label: "Deployment", value: "Dockerized Microservice" },
+      ],
+      stackDetails: [
+        "XGBoost + Random Forest ensemble for risk scoring",
+        "FastAPI for low-latency REST inference endpoints",
+        "PostgreSQL for transaction history and audit logs",
+        "Docker Compose for portable service orchestration",
+        "Redis (roadmap) for sub-ms feature cache; Kafka for event ingestion at scale",
+      ],
+    },
+  },
+  {
+    emoji: "🚌",
+    bg: "rgba(16,185,129,0.12)",
+    accent: "#10B981",
+    badge: "GenAI · RAG",
+    name: "VoltTransit – AI Emergency RAG Engine",
+    desc: "Safety-critical AI assistant generating verified emergency response checklists for EV transit operators using Retrieval-Augmented Generation with hallucination prevention.",
+    stack: ["FastAPI", "LangChain", "ChromaDB", "Sentence Transformers", "Python", "Docker"],
+    featured: true,
+    details: {
+      type: "Individual", status: "Ongoing",
+      github: null,
+      problem: "LLMs hallucinate safety-critical procedures, making them dangerous for emergency response in public transit. Operators need verifiable, source-traced checklists — not LLM guesses.",
+      contributions: [
+        "Implemented section-aware semantic chunking of EV safety manuals for precise retrieval",
+        "Built vector search pipeline with ChromaDB + Sentence Transformers and similarity thresholding",
+        "Engineered hallucination prevention: responses trace back to source document passages",
+        "Added Retrieval@K evaluation framework to measure retrieval quality",
+        "Designed human-escalation mechanism for edge cases below confidence threshold",
+      ],
+      metrics: [
+        { label: "Architecture", value: "RAG Pipeline" },
+        { label: "Hallucination Guard", value: "Source Tracing" },
+        { label: "Escalation", value: "Human-in-the-loop" },
+        { label: "Status", value: "Ongoing" },
+      ],
+      stackDetails: [
+        "LangChain orchestration with custom RAG chain",
+        "ChromaDB vector store for EV manual embeddings",
+        "Sentence Transformers for semantic similarity scoring",
+        "FastAPI backend with Docker containerization",
+        "Retrieval@K eval + similarity threshold gating",
+      ],
+    },
+  },
+  {
+    emoji: "🎟️",
+    bg: "rgba(245,158,11,0.1)",
+    accent: "#F59E0B",
+    badge: "Distributed Systems · Backend",
+    name: "Distributed Event-Driven Ticketing Engine",
+    desc: "High-performance flash-sale pipeline with strict consistency — decouples inventory reservation from async payment settlement using Kafka, Redis, and the Transactional Outbox Pattern.",
+    stack: ["Java", "Spring Boot", "PostgreSQL", "Redis", "Apache Kafka", "Debezium", "Docker", "Prometheus", "Grafana"],
+    details: {
+      type: "Individual", status: "Complete",
+      github: null,
+      problem: "Flash sales cause thundering-herd gridlock: connection pool exhaustion, race-condition double-bookings, and distributed transaction bottlenecks that lead to overselling under load.",
+      contributions: [
+        "Designed Redis Lua scripting for atomic inventory allocation, eliminating race conditions",
+        "Implemented Transactional Outbox Pattern via Debezium CDC for guaranteed at-least-once event delivery",
+        "Separated high-speed inventory reservation from async payment settlement with Kafka topics",
+        "Built Distributed Saga compensation logic for payment failure rollback",
+        "Configured Prometheus + Grafana observability stack with custom flash-sale dashboards",
+      ],
+      metrics: [
+        { label: "Target Throughput", value: "10,000+ RPS" },
+        { label: "Overselling Rate", value: "0.00%" },
+        { label: "Event Delivery", value: "At-least-once" },
+        { label: "Observability", value: "Prometheus + Grafana" },
+      ],
+      stackDetails: [
+        "Kafka Connect + Debezium for WAL-tailing CDC",
+        "Redis with atomic Lua scripts for inventory reservation",
+        "PostgreSQL with Transactional Outbox for event sourcing",
+        "Spring Boot Saga orchestration for payment compensation",
+        "Prometheus metrics + Grafana dashboards for SLA monitoring",
+      ],
+    },
   },
   {
     emoji: "🏥",
-    bg: "rgba(16,185,129,0.1)",
-    accent: "#10B981",
+    bg: "rgba(139,92,246,0.1)",
+    accent: "#8B5CF6",
     badge: "GenAI · Healthcare",
     name: "AI Multi-Agent Healthcare Platform",
-    desc: "Multi-agent LangChain system for diabetes risk assessment. Orchestrates specialist agents for medical PDF analysis, emergency alerting, and clinical decision support with secure async backend.",
-    stack: ["LangChain", "FastAPI", "PostgreSQL", "MongoDB", "JWT"],
-    featured: true,
+    desc: "Multi-agent LangChain system assisting clinicians in diabetes risk assessment — orchestrating specialist agents for report analysis, risk prediction, and emergency alerting.",
+    stack: ["LangChain", "FastAPI", "PostgreSQL", "MongoDB", "Python"],
+    details: {
+      type: "Team", status: "Complete",
+      github: null,
+      problem: "Clinicians waste hours manually reviewing patient reports and lack an automated system to flag high-risk diabetes cases for immediate escalation.",
+      contributions: [
+        "Developed the Report Analyzer agent for extracting clinical insights from medical PDFs",
+        "Built the Master Orchestrator agent coordinating specialist sub-agents in a pipeline",
+        "Engineered the Alert Agent for real-time emergency escalation on high-risk predictions",
+        "Implemented secure FastAPI backend with JWT authentication and HIPAA-aligned data handling",
+        "Integrated PostgreSQL + MongoDB hybrid storage for structured vitals and unstructured report data",
+      ],
+      metrics: [
+        { label: "Project Type", value: "Team Project" },
+        { label: "Agent Architecture", value: "Multi-Agent (LangChain)" },
+        { label: "Auth", value: "JWT Secured" },
+        { label: "Storage", value: "PostgreSQL + MongoDB" },
+      ],
+      stackDetails: [
+        "LangChain multi-agent orchestration with tool-use",
+        "FastAPI with JWT auth for secure clinical API endpoints",
+        "PostgreSQL for structured patient vitals and history",
+        "MongoDB for unstructured medical report storage",
+        "Python ML models for diabetes risk probability scoring",
+      ],
+    },
   },
   {
     emoji: "🧬",
-    bg: "rgba(139,92,246,0.12)",
-    accent: "#8B5CF6",
-    badge: "Bioinformatics · Web3",
-    name: "VA-2 Genomic Data Platform",
-    desc: "Blockchain-enabled genomic analysis platform. Fine-tuned Evo 2 foundation model for variant analysis, built data preprocessing pipelines, and integrated NFT minting on BNB Smart Chain for decentralized research ownership.",
-    stack: ["Evo 2", "FastAPI", "BNB Chain", "PostgreSQL", "NFT"],
-    featured: true,
-  },
-  {
-    emoji: "✈️",
-    bg: "rgba(245,158,11,0.1)",
-    accent: "#F59E0B",
-    badge: "AI Agents · Travel",
-    name: "MCP Travel Planner",
-    desc: "MCP-powered AI travel assistant that auto-generates personalized itineraries by aggregating weather, tourist attractions, accommodations and restaurant data through multiple REST APIs.",
-    stack: ["MCP Protocol", "FastAPI", "Docker", "REST APIs"],
-  },
-  {
-    emoji: "🌿",
-    bg: "rgba(16,185,129,0.08)",
-    accent: "#10B981",
-    badge: "GIS · Computer Vision",
-    name: "EcoTrack Wildlife Platform",
-    desc: "Wildlife conservation system with real-time deforestation monitoring and poaching detection. YOLOv8 object detection layered over a PostGIS geospatial database with Mapbox-powered maps.",
-    stack: ["Next.js", "YOLOv8", "PostGIS", "Mapbox", "TensorFlow"],
-  },
-  {
-    emoji: "⚖️",
-    bg: "rgba(244,63,94,0.08)",
-    accent: "#F43F5E",
-    badge: "LegalTech · NLP",
-    name: "AI Legal Assistance Platform",
-    desc: "Multilingual legal assistant with Azure OpenAI and BHASHINI API for regional language support. Includes OCR-based document analysis, speech-to-text, and AI-driven case guidance.",
-    stack: ["Next.js", "Azure OpenAI", "BHASHINI API", "OCR", "PostgreSQL"],
-  },
-  {
-    emoji: "📊",
-    bg: "rgba(6,182,212,0.08)",
+    bg: "rgba(6,182,212,0.1)",
     accent: "#06B6D4",
-    badge: "Productivity · AI",
-    name: "Team Productivity Dashboard",
-    desc: "ScreenPipe-powered AI dashboard that analyzes user activity patterns and surfaces context-aware recommendations to improve team efficiency and workflow management.",
-    stack: ["ScreenPipe", "FastAPI", "React", "AI Models"],
+    badge: "Bioinformatics · Web3",
+    name: "VA-2 Genomic Data Analysis Platform",
+    desc: "AI + blockchain platform combining Evo 2 genomic foundation model fine-tuning with BNB Smart Chain provenance for secure, ownership-tracked genomic research.",
+    stack: ["FastAPI", "PostgreSQL", "Evo 2", "Python", "BNB Smart Chain"],
+    details: {
+      type: "Team", status: "Complete",
+      github: null,
+      problem: "Genomic research outputs lack verifiable ownership and chain-of-custody, making it impossible to attribute discoveries or prevent data theft in collaborative environments.",
+      contributions: [
+        "Fine-tuned the Evo 2 genomic foundation model for variant-specific sequence analysis",
+        "Built genomic preprocessing pipelines: quality filtering, sequence normalization, variant calling",
+        "Designed and implemented FastAPI backend endpoints for genomic data submission and retrieval",
+        "Integrated BNB Smart Chain for blockchain-backed NFT minting of research outputs",
+        "Designed PostgreSQL schema for multi-user genomic dataset management",
+      ],
+      metrics: [
+        { label: "Foundation Model", value: "Evo 2 (Fine-tuned)" },
+        { label: "Blockchain", value: "BNB Smart Chain" },
+        { label: "Hackathon", value: "🏅 4th Place — International" },
+        { label: "Type", value: "Team Project" },
+      ],
+      stackDetails: [
+        "Evo 2 genomic foundation model with task-specific fine-tuning",
+        "FastAPI for RESTful genomic data ingestion and analysis APIs",
+        "BNB Smart Chain + NFT minting for research provenance",
+        "PostgreSQL relational schema for multi-user dataset tracking",
+        "Python bioinformatics pipeline: FASTQ processing + variant annotation",
+      ],
+    },
   },
   {
     emoji: "💧",
     bg: "rgba(59,130,246,0.08)",
     accent: "#3B82F6",
-    badge: "Smart India Hackathon 2025",
-    name: "Groundwater Monitoring & Analytics Platform",
-    desc: "Developed a real-time groundwater monitoring application featuring interactive GIS maps, water quality analysis, recharge tracking, and intelligent alert systems to support sustainable water resource management across monitoring stations.",
-    stack: ["React Native", "Expo", "TypeScript", "Maps", "Analytics"],
+    badge: "Smart India Hackathon · Mobile",
+    name: "Groundwater Resource Evaluation System",
+    desc: "SIH mobile app enabling government agencies to monitor groundwater via DWLR station data — featuring GIS maps, real-time analytics, and alert interfaces for Android and iOS.",
+    stack: ["React Native", "Expo", "TypeScript", "Expo Router"],
+    details: {
+      type: "Team", status: "Complete",
+      github: null,
+      problem: "Government groundwater agencies rely on manual DWLR readings with no centralized dashboard, making it impossible to detect water-level anomalies or trigger timely alerts.",
+      contributions: [
+        "Designed and built the entire React Native dashboard from scratch",
+        "Implemented interactive GIS-based map for visualizing DWLR station coverage",
+        "Built real-time water-level charts with trend analytics and anomaly highlighting",
+        "Developed alert notification system for groundwater level threshold breaches",
+        "Ensured cross-platform compatibility for both Android and iOS via Expo",
+      ],
+      metrics: [
+        { label: "Platform", value: "Android + iOS" },
+        { label: "Event", value: "Smart India Hackathon" },
+        { label: "Frontend", value: "React Native + Expo" },
+        { label: "Type", value: "Team Project" },
+      ],
+      stackDetails: [
+        "React Native with Expo managed workflow",
+        "TypeScript for type-safe component development",
+        "Expo Router for file-based navigation",
+        "GIS integration for DWLR station mapping",
+        "Charting libraries for real-time water level visualization",
+      ],
+    },
   },
 ];
 
@@ -665,10 +903,10 @@ function ProfileOrb() {
         boxShadow: "0 0 8px #4ade80", animation: "glow 2.5s ease-in-out infinite",
       }} />
       {[
-        { label: "React.js",  top: -14,  left: -50,  c: "#3B82F6" },
-        { label: "FastAPI",   bottom: 20, left: -56,  c: "#10B981" },
-        { label: "Docker",    top: 10,   right: -54, c: "#06B6D4" },
-        { label: "Langchain", bottom: 20, right: -60,   c: "#fb5223" },
+        { label: "React.js",  top: -14,  left: -50,  c: "#3B82F6", dur: 4.6 },
+        { label: "FastAPI",   bottom: 20, left: -56,  c: "#10B981", dur: 5.2 },
+        { label: "Docker",    top: 10,   right: -54, c: "#06B6D4",  dur: 4.4 },
+        { label: "Langchain", bottom: 20, right: -60, c: "#fb5223", dur: 5.8 },
       ].map((ch) => (
         <div key={ch.label} style={{
           position: "absolute",
@@ -677,7 +915,7 @@ function ProfileOrb() {
           borderRadius: 7, padding: "5px 11px",
           fontSize: 11, fontFamily: "var(--mono)", color: ch.c,
           whiteSpace: "nowrap", backdropFilter: "blur(8px)",
-          animation: `float ${4 + Math.random() * 2}s ease-in-out infinite`,
+          animation: `float ${ch.dur}s ease-in-out infinite`,
         }}>
           {ch.label}
         </div>
@@ -802,6 +1040,223 @@ function SkillCard({ s, large = false }) {
   );
 }
 
+// ─── PROJECT MODAL ────────────────────────────────────────────────────────────
+function ProjectModal({ project: p, onClose }) {
+  useEffect(() => {
+    document.body.style.overflow = "hidden";
+    const onKey = (e) => { if (e.key === "Escape") onClose(); };
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.body.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [onClose]);
+
+  const d = p.details;
+  const accent = p.accent;
+
+  return (
+    <div className="modal-backdrop" onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}>
+      <div className="modal-panel" style={{ border: `1px solid ${accent}30` }}>
+
+        {/* ── Accent top bar ── */}
+        <div style={{
+          height: 3,
+          background: `linear-gradient(90deg, ${accent}, ${accent}55, transparent)`,
+          borderRadius: "20px 20px 0 0",
+        }} />
+
+        {/* ── Close btn ── */}
+        <button className="modal-close" onClick={onClose}>✕</button>
+
+        {/* ── Header ── */}
+        <div style={{ padding: "32px 36px 24px" }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 16 }}>
+            <div style={{
+              width: 52, height: 52, borderRadius: 14,
+              background: p.bg, display: "flex", alignItems: "center",
+              justifyContent: "center", fontSize: 24, flexShrink: 0,
+              border: `1px solid ${accent}30`,
+            }}>{p.emoji}</div>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6, flexWrap: "wrap" }}>
+                <span style={{
+                  fontFamily: "var(--mono)", fontSize: 11, padding: "3px 10px",
+                  borderRadius: 4, background: `${accent}18`,
+                  color: accent, border: `1px solid ${accent}30`,
+                }}>{p.badge}</span>
+                <span style={{
+                  fontFamily: "var(--mono)", fontSize: 11, padding: "3px 10px",
+                  borderRadius: 4,
+                  background: d.status === "Ongoing" ? "rgba(245,158,11,.12)" : "rgba(16,185,129,.1)",
+                  color: d.status === "Ongoing" ? "#F59E0B" : "#10B981",
+                  border: `1px solid ${d.status === "Ongoing" ? "rgba(245,158,11,.25)" : "rgba(16,185,129,.2)"}`,
+                }}>{d.status === "Ongoing" ? "⟳ Ongoing" : "✓ Complete"}</span>
+                <span style={{
+                  fontFamily: "var(--mono)", fontSize: 11, padding: "3px 10px",
+                  borderRadius: 4, background: "rgba(255,255,255,.04)",
+                  color: "var(--text-s)", border: "1px solid var(--bdr)",
+                }}>{d.type} Project</span>
+              </div>
+              <h2 style={{
+                fontFamily: "var(--display)", fontSize: "clamp(18px,2.5vw,24px)",
+                fontWeight: 800, letterSpacing: "-.5px", color: "var(--text)",
+              }}>{p.name}</h2>
+            </div>
+          </div>
+
+          {/* ── Divider ── */}
+          <div style={{ height: 1, background: `linear-gradient(90deg, ${accent}33, var(--bdr), transparent)`, margin: "0 0 28px" }} />
+
+          {/* ── Body: 60/40 split ── */}
+          <div style={{
+            display: "grid",
+            gridTemplateColumns: "1fr",
+            gap: 28,
+          }}>
+            {/* LEFT — Problem + Contributions */}
+            <div style={{ display: "grid", gridTemplateColumns: "minmax(0,1.6fr) minmax(0,1fr)", gap: 28 }}>
+              <div>
+                {/* Problem */}
+                <div style={{
+                  background: `${accent}0a`, border: `1px solid ${accent}20`,
+                  borderRadius: 12, padding: "18px 20px", marginBottom: 22,
+                }}>
+                  <div style={{
+                    fontFamily: "var(--mono)", fontSize: 11, color: accent,
+                    letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 10,
+                    display: "flex", alignItems: "center", gap: 6,
+                  }}>
+                    <span style={{ fontSize: 14 }}>🔍</span> The Problem
+                  </div>
+                  <p style={{ fontSize: 13.5, color: "var(--text-s)", lineHeight: 1.75 }}>{d.problem}</p>
+                </div>
+
+                {/* Contributions */}
+                <div>
+                  <div style={{
+                    fontFamily: "var(--mono)", fontSize: 11, color: "var(--text-s)",
+                    letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 14,
+                    display: "flex", alignItems: "center", gap: 6,
+                  }}>
+                    <span style={{ fontSize: 14 }}>🏗️</span> Core Contributions
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                    {d.contributions.map((c, i) => (
+                      <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                        <div style={{
+                          width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
+                          background: `${accent}18`, border: `1px solid ${accent}30`,
+                          display: "flex", alignItems: "center", justifyContent: "center",
+                          fontSize: 10, color: accent, fontFamily: "var(--mono)", fontWeight: 700,
+                          marginTop: 1,
+                        }}>{i + 1}</div>
+                        <p style={{ fontSize: 13.5, color: "var(--text-s)", lineHeight: 1.65, margin: 0 }}>{c}</p>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+
+              {/* RIGHT — Metrics + Stack Details */}
+              <div>
+                {/* Metrics */}
+                <div style={{ marginBottom: 22 }}>
+                  <div style={{
+                    fontFamily: "var(--mono)", fontSize: 11, color: "var(--text-s)",
+                    letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 14,
+                    display: "flex", alignItems: "center", gap: 6,
+                  }}>
+                    <span style={{ fontSize: 14 }}>⚡</span> Key Metrics
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 10 }}>
+                    {d.metrics.map((m) => (
+                      <div key={m.label} className="metric-chip" style={{ borderColor: `${accent}20` }}>
+                        <div style={{ fontSize: 11, color: "var(--text-m)", fontFamily: "var(--mono)", marginBottom: 4 }}>{m.label}</div>
+                        <div style={{ fontSize: 13, color: accent, fontWeight: 600, fontFamily: "var(--mono)" }}>{m.value}</div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Stack Details */}
+                <div>
+                  <div style={{
+                    fontFamily: "var(--mono)", fontSize: 11, color: "var(--text-s)",
+                    letterSpacing: "1.5px", textTransform: "uppercase", marginBottom: 14,
+                    display: "flex", alignItems: "center", gap: 6,
+                  }}>
+                    <span style={{ fontSize: 14 }}>🛠️</span> Stack Details
+                  </div>
+                  <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {d.stackDetails.map((s, i) => (
+                      <div key={i} style={{
+                        display: "flex", gap: 10, alignItems: "flex-start",
+                        fontSize: 12.5, color: "var(--text-s)", lineHeight: 1.6,
+                      }}>
+                        <span style={{ color: accent, flexShrink: 0, marginTop: 1 }}>▸</span>
+                        {s}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* ── Footer: Tech chips + GitHub ── */}
+          <div style={{
+            marginTop: 28, paddingTop: 24,
+            borderTop: "1px solid var(--bdr)",
+            display: "flex", alignItems: "center",
+            justifyContent: "space-between", flexWrap: "wrap", gap: 16,
+          }}>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+              {p.stack.map((t) => (
+                <span key={t} style={{
+                  fontSize: 11.5, fontFamily: "var(--mono)",
+                  color: "var(--text-s)",
+                  background: `${accent}0c`,
+                  border: `1px solid ${accent}25`,
+                  borderRadius: 5, padding: "4px 10px",
+                }}>{t}</span>
+              ))}
+            </div>
+            {d.github ? (
+              <a
+                href={d.github}
+                target="_blank"
+                rel="noopener noreferrer"
+                style={{
+                  display: "inline-flex", alignItems: "center", gap: 8,
+                  background: `${accent}18`, border: `1px solid ${accent}40`,
+                  color: accent, borderRadius: 8, padding: "9px 18px",
+                  fontSize: 13, fontWeight: 600, fontFamily: "var(--body)",
+                  textDecoration: "none",
+                  transition: "background .2s, transform .2s",
+                }}
+                onMouseEnter={(e) => { e.currentTarget.style.background = `${accent}28`; e.currentTarget.style.transform = "translateY(-2px)"; }}
+                onMouseLeave={(e) => { e.currentTarget.style.background = `${accent}18`; e.currentTarget.style.transform = ""; }}
+              >
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0024 12c0-6.63-5.37-12-12-12z"/>
+                </svg>
+                View on GitHub
+              </a>
+            ) : (
+              <span style={{
+                fontSize: 12, fontFamily: "var(--mono)", color: "var(--text-m)",
+                padding: "9px 14px", background: "rgba(255,255,255,.03)",
+                border: "1px solid var(--bdr)", borderRadius: 8,
+              }}>🔒 Private Repository</span>
+            )}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MarqueeBand() {
   const full = [...TECH_MARQUEE, ...TECH_MARQUEE];
 
@@ -863,6 +1318,7 @@ export default function Portfolio() {
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
   const [activeTab, setActiveTab] = useState("all");
+  const [selectedProject, setSelectedProject] = useState(null);
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -875,13 +1331,13 @@ export default function Portfolio() {
     setMenuOpen(false);
   };
 
-  const FILTER_TABS = ["all", "AI/ML", "Web", "Backend", "Blockchain", "GIS"];
+  const FILTER_TABS = ["all", "AI/ML", "Backend", "Java", "Blockchain", "Mobile"];
   const FILTER_MAP = {
-    "AI/ML":      (p) => ["ML · FinTech","GenAI · Healthcare","Bioinformatics · Web3","Productivity · AI"].includes(p.badge),
-    "Web":        (p) => ["GIS · Computer Vision","LegalTech · NLP","Smart City · Simulation"].includes(p.badge) || p.stack.some(s=>["Next.js","React"].includes(s)),
-    "Backend":    (p) => p.stack.some(s=>["FastAPI","Node.js","REST APIs","Docker"].includes(s)),
-    "Blockchain": (p) => p.badge.includes("Web3") || p.stack.some(s=>["BNB Chain","NFT"].includes(s)),
-    "GIS":        (p) => p.badge.includes("GIS"),
+    "AI/ML":      (p) => ["AI/ML · FinTech","GenAI · RAG","GenAI · Healthcare"].includes(p.badge) || p.stack.some(s=>["XGBoost","LangChain","ChromaDB","Random Forest"].includes(s)),
+    "Backend":    (p) => ["Distributed Systems · Backend"].includes(p.badge) || p.stack.some(s=>["FastAPI","Spring Boot","Docker","Kafka","Redis"].includes(s)),
+    "Java":       (p) => ["Java · Full Stack","Distributed Systems · Backend"].includes(p.badge) || p.stack.some(s=>["Java","Spring Boot","Spring Security"].includes(s)),
+    "Blockchain": (p) => p.badge.includes("Web3") || p.stack.some(s=>["BNB Smart Chain","BNB Chain","NFT"].includes(s)),
+    "Mobile":     (p) => p.badge.includes("Mobile") || p.stack.some(s=>["React Native","Expo","Expo Router"].includes(s)),
   };
   const filtered = activeTab === "all" ? PROJECTS : PROJECTS.filter(FILTER_MAP[activeTab]);
 
@@ -1209,10 +1665,13 @@ export default function Portfolio() {
         <FadeBox>
           <SectionLabel>Projects</SectionLabel>
           <h2 style={{ fontFamily:"var(--display)", fontSize:"clamp(28px,4vw,44px)", fontWeight:800, letterSpacing:"-1.5px", marginBottom:12 }}>
-            Things I've shipped.
+            Things I&apos;ve shipped.
           </h2>
-          <p style={{ color:"var(--text-s)", fontSize:16, marginBottom:32 }}>
-            From ML pipelines to React UIs to blockchain contracts — full spectrum.
+          <p style={{ color:"var(--text-s)", fontSize:16, marginBottom:6 }}>
+            From distributed systems to AI pipelines to mobile apps — full spectrum engineering.
+          </p>
+          <p style={{ color:"var(--text-m)", fontSize:13.5, fontFamily:"var(--mono)", marginBottom:32, display:"flex", alignItems:"center", gap:6 }}>
+            <span style={{ color:"var(--blue)" }}>↗</span> Click any card to explore the full architecture.
           </p>
 
           <div style={{ display:"flex", gap:8, flexWrap:"wrap", marginBottom:40 }}>
@@ -1236,27 +1695,116 @@ export default function Portfolio() {
         </FadeBox>
 
         <FadeBox delay={0.1}>
-          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))", gap:18 }}>
-            {filtered.map((p) => (
-              <div key={p.name} className={`project-card${p.featured ? " featured" : ""}`}
-                style={p.featured ? { borderColor:`${p.accent}33`, background:"linear-gradient(145deg,#111827,#0d1525)" } : {}}
-              >
-                <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:16 }}>
-                  <div style={{ width:40, height:40, borderRadius:10, display:"flex", alignItems:"center", justifyContent:"center", fontSize:18, background:p.bg }}>{p.emoji}</div>
-                  <span className="tag" style={{ background:`${p.accent}18`, color:p.accent, border:`1px solid ${p.accent}30` }}>{p.badge}</span>
+          <div style={{ display:"grid", gridTemplateColumns:"repeat(auto-fill,minmax(320px,1fr))", gap:20 }}>
+            {filtered.map((p) => {
+              const isFeat = !!p.featured;
+              return (
+                <div
+                  key={p.name}
+                  className="project-card"
+                  onClick={() => setSelectedProject(p)}
+                  style={{
+                    borderColor: isFeat ? `${p.accent}33` : "var(--bdr)",
+                    background: isFeat
+                      ? "linear-gradient(145deg,#111827,#0d1525)"
+                      : "var(--card)",
+                    "--card-accent": p.accent,
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.borderColor = p.accent + "55";
+                    e.currentTarget.style.transform = "translateY(-5px) scale(1.01)";
+                    e.currentTarget.style.boxShadow = `0 20px 48px ${p.accent}18, 0 4px 16px rgba(0,0,0,.3)`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.borderColor = isFeat ? `${p.accent}33` : "var(--bdr)";
+                    e.currentTarget.style.transform = "";
+                    e.currentTarget.style.boxShadow = "";
+                  }}
+                >
+                  {/* Featured ribbon */}
+                  {isFeat && (
+                    <div style={{
+                      position: "absolute", top: 0, left: 0, right: 0, height: 2,
+                      background: `linear-gradient(90deg, ${p.accent}, ${p.accent}55, transparent)`,
+                      borderRadius: "16px 16px 0 0",
+                    }} />
+                  )}
+
+                  {/* Top row: icon + badge + expand hint */}
+                  <div style={{ display:"flex", alignItems:"flex-start", justifyContent:"space-between", marginBottom:16 }}>
+                    <div style={{
+                      width: 44, height: 44, borderRadius: 12,
+                      display:"flex", alignItems:"center", justifyContent:"center",
+                      fontSize: 20, background: p.bg,
+                      border: `1px solid ${p.accent}25`,
+                    }}>{p.emoji}</div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                      <span className="tag" style={{
+                        background:`${p.accent}18`, color:p.accent,
+                        border:`1px solid ${p.accent}30`,
+                      }}>{p.badge}</span>
+                    </div>
+                  </div>
+
+                  {/* Title */}
+                  <div style={{
+                    fontFamily:"var(--display)", fontSize:16.5, fontWeight:700,
+                    marginBottom: 10, color:"var(--text)", letterSpacing: "-.3px",
+                    lineHeight: 1.3,
+                  }}>{p.name}</div>
+
+                  {/* Description */}
+                  <p style={{
+                    fontSize: 13, color:"var(--text-s)", lineHeight:1.75,
+                    flex:1, marginBottom:20,
+                  }}>{p.desc}</p>
+
+                  {/* Stack pills */}
+                  <div style={{ display:"flex", flexWrap:"wrap", gap:6, marginBottom: 18 }}>
+                    {p.stack.slice(0, 5).map((t) => (
+                      <span key={t} style={{
+                        fontSize: 10.5, fontFamily:"var(--mono)",
+                        color:"var(--text-m)",
+                        background:`${p.accent}0a`,
+                        border:`1px solid ${p.accent}20`,
+                        borderRadius: 4, padding:"3px 8px",
+                      }}>{t}</span>
+                    ))}
+                    {p.stack.length > 5 && (
+                      <span style={{
+                        fontSize: 10.5, fontFamily:"var(--mono)",
+                        color:"var(--text-m)",
+                        background:"rgba(255,255,255,.03)",
+                        border:"1px solid var(--bdr)",
+                        borderRadius: 4, padding:"3px 8px",
+                      }}>+{p.stack.length - 5} more</span>
+                    )}
+                  </div>
+
+                  {/* Click-to-expand CTA */}
+                  <div className="pc-expand" style={{
+                    display: "flex", alignItems: "center", gap: 6,
+                    fontSize: 12, fontFamily: "var(--mono)",
+                    color: p.accent, borderTop: `1px solid ${p.accent}20`,
+                    paddingTop: 14, marginTop: "auto",
+                  }}>
+                    <span>↗</span>
+                    <span>Explore deep-dive</span>
+                  </div>
                 </div>
-                <div style={{ fontFamily:"var(--display)", fontSize:17, fontWeight:700, marginBottom:10, color:"var(--text)" }}>{p.name}</div>
-                <p style={{ fontSize:13.5, color:"var(--text-s)", lineHeight:1.7, flex:1, marginBottom:18 }}>{p.desc}</p>
-                <div style={{ display:"flex", flexWrap:"wrap", gap:6 }}>
-                  {p.stack.map((t) => (
-                    <span key={t} style={{ fontSize:11, fontFamily:"var(--mono)", color:"var(--text-m)", background:"rgba(255,255,255,.025)", border:"1px solid var(--bdr)", borderRadius:4, padding:"3px 8px" }}>{t}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         </FadeBox>
       </section>
+
+      {/* ── PROJECT MODAL ──────────────────────────────────────────────────── */}
+      {selectedProject && (
+        <ProjectModal
+          project={selectedProject}
+          onClose={() => setSelectedProject(null)}
+        />
+      )}
 
       {/* ── HACKATHONS ────────────────────────────────────────────────────── */}
       <section id="hackathons" style={{ padding: "100px 5%" }}>
